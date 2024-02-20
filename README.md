@@ -8,6 +8,6 @@
 
 <p align="center">
     <a href="https://github.com/menisadi/galton/pulse">
-      <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/menisadi/galton">
+      <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/menisadi/galton">
     </a>
 </p>
