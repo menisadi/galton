@@ -5,9 +5,9 @@ window_width, window_height = love.window.getMode()
 
 -- Create a little circle
 local bead = {
-	x = window_width / 2,
+	x = window_width * 0.2,
 	y = 0,
-	speed = { x = 0, y = 200 },
+	speed = { x = 200, y = 200 },
 	radius = 30,
 }
 
@@ -29,9 +29,14 @@ function love.update(dt)
 	-- bead got to the bottom of the screen -> appear at the top
 	if bead.y > window_height then
 		bead.y = 0
-		bead.x = window_width / 2
-		bead.speed.x = 0
 		bead.speed.y = 200
+		if bead.x >= window_width / 2 then
+			bead.x = window_width * 0.2
+			bead.speed.x = 200
+		else
+			bead.x = window_width * (1 - 0.2)
+			bead.speed.x = -200
+		end
 	end
 
 	local function dist(p1, p2)
