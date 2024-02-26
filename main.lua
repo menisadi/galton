@@ -56,8 +56,19 @@ function love.update(dt)
 end
 
 function love.draw()
+	-- Calculate the offset for the camera effect
+	local camera_offset_x = window_width / 2 - bead.x
+	local camera_offset_y = window_height / 2 - bead.y
+
+	-- Translate the coordinate system to give the camera effect
+	love.graphics.translate(camera_offset_x, camera_offset_y)
+
+	-- Draw the bead and peg relative to the camera
 	love.graphics.setColor(1, 0, 0)
 	love.graphics.circle("fill", bead.x, bead.y, bead.radius)
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.circle("fill", peg.x, peg.y, peg.radius)
+
+	-- Reset the translation
+	love.graphics.translate(-camera_offset_x, -camera_offset_y)
 end
