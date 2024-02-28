@@ -9,6 +9,9 @@ local bead = {
 	y = 0,
 	speed = { x = 200, y = 200 },
 	radius = 30,
+	angle = 0,
+	angle_sign = 1,
+	image = nil,
 }
 
 local peg = {
@@ -18,6 +21,10 @@ local peg = {
 }
 
 local gravity = 150
+
+function love.load()
+	bead.image = love.graphics.newImage("bead.png")
+end
 
 function love.update(dt)
 	bead.speed.y = bead.speed.y + gravity * dt
@@ -50,9 +57,13 @@ function love.update(dt)
 		local side = 2 * math.random(2) - 3
 		bead.speed.x = bead.speed.y * 0.4 * side
 		bead.speed.y = -bead.speed.y * 0.4
+		bead.angle_sign = side
 	end
 	-- if bead.y + bead.radius >= peg.y - peg.radius then
 	-- end
+
+	-- Update rotation angle based on movement
+	bead.angle = bead.angle + 1.8 * bead.angle_sign * dt
 end
 
 function love.draw()
@@ -63,9 +74,12 @@ function love.draw()
 	-- Translate the coordinate system to give the camera effect
 	love.graphics.translate(camera_offset_x, camera_offset_y)
 
-	-- Draw the bead and peg relative to the camera
-	love.graphics.setColor(1, 0, 0)
-	love.graphics.circle("fill", bead.x, bead.y, bead.radius)
+	-- Draw the bead image with rotation and scaling
+	local scale = bead.radius * 2 / bead.image:getWidth() -- Scale relative to the radius of the bead
+	love.graphics.draw(bead.image, bead.x, bead.y, bead.angle, scale, scale, bead.image:getWidth() / 2,
+		bead.image:getHeight() / 2)
+
+	-- Draw peg relative to the camera
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.circle("fill", peg.x, peg.y, peg.radius)
 
