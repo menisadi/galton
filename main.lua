@@ -22,6 +22,10 @@ local peg = {
 
 local gravity = 150
 
+-- Diamonds parameters
+local diamonds = {}
+local max_diamonds = 5
+
 function love.load()
 	bead.image = love.graphics.newImage("bead.png")
 end
@@ -64,9 +68,32 @@ function love.update(dt)
 
 	-- Update rotation angle based on movement
 	bead.angle = bead.angle + 1.8 * bead.angle_sign * dt
+	-- Update diamonds
+	for i = #diamonds, 1, -1 do
+		diamonds[i].timer = diamonds[i].timer - dt
+		if diamonds[i].timer <= 0 then
+			table.remove(diamonds, i)
+		else
+			diamonds[i].size = diamonds[i].size + (diamonds[i].max_size - diamonds[i].size) * dt * 5
+		end
+	end
+
+	if #diamonds < max_diamonds and math.random() < 0.02 then
+		local diamond = {
+			x = math.random(window_width),
+			y = math.random(window_height),
+			size = 0,
+			max_size = math.random(5, 15),
+			timer = math.random(0.5, 1),
+		}
+		table.insert(diamonds, diamond)
+	end
 end
 
 function love.draw()
+	-- Draw background
+	love.graphics.setBackgroundColor(0, 0, 0.3) -- Dark blue background
+
 	-- Calculate the offset for the camera effect
 	local camera_offset_x = window_width / 2 - bead.x
 	local camera_offset_y = window_height / 2 - bead.y
@@ -80,8 +107,16 @@ function love.draw()
 		bead.image:getHeight() / 2)
 
 	-- Draw peg relative to the camera
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(0.3, 0.3, 0.3)
 	love.graphics.circle("fill", peg.x, peg.y, peg.radius)
+
+	-- Draw diamonds
+	love.graphics.setColor(1, 1, 0, 0.5) -- Yellow
+	for _, diamond in ipairs(diamonds) do
+		local size = diamond.size
+		love.graphics.polygon("fill", diamond.x, diamond.y - size, diamond.x - size, diamond.y, diamond.x,
+			diamond.y + size, diamond.x + size, diamond.y)
+	end
 
 	-- Reset the translation
 	love.graphics.translate(-camera_offset_x, -camera_offset_y)
