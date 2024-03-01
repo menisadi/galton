@@ -1,7 +1,10 @@
 math = require("math")
 
+local font = love.graphics.newFont(24)
+
 -- Define a boolean variable to track if the game has started
 local gameStarted = false
+local pause = false
 
 -- Window specs
 WindowWidth, WindowHeight = love.window.getMode()
@@ -54,11 +57,13 @@ function love.keypressed(key)
 	-- Check if the Enter key is pressed
 	if key == "return" then
 		gameStarted = true
+	elseif key == "space" then
+		pause = not pause
 	end
 end
 
 function love.update(dt)
-	if gameStarted then
+	if gameStarted and not pause then
 		bead.speed.y = bead.speed.y + gravity * dt
 		-- bead.speed.x = bead.speed.x + bead.acceleration.x
 
@@ -152,8 +157,6 @@ end
 function love.draw()
 	-- Draw background
 	love.graphics.setBackgroundColor(0.05, 0, 0.2) -- Dark blue background
-	local font = love.graphics.newFont(24)
-
 
 	if not gameStarted then
 		love.graphics.setColor(1, 1, 1) -- White color for text
