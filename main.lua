@@ -7,13 +7,15 @@ local gameStarted = false
 WindowWidth, WindowHeight = love.window.getMode()
 
 local moveDirection = 2 * math.random(2) - 3
-local levels = 1
+local init_levels = 1
+local levels = init_levels
+local colisions = init_levels
 local reacedGround = false
 
 -- Create a little circle
 local bead = {
 	x = WindowWidth * 0.5,
-	y = 0, -- WindowHeight * 0.0,
+	y = 0,
 	speed = { x = 0, y = 200 },
 	radius = 30,
 	angle = 0,
@@ -106,6 +108,7 @@ function love.update(dt)
 		-- colision -> bounce
 		if dist(bead, peg) <= bead.radius + peg.radius then
 			if not reacedGround then
+				colisions = colisions - 1
 				bead.y = peg.y - peg.radius - bead.radius
 				-- local side = 2 * math.random(2) - 3
 				local side = moveDirection
@@ -149,6 +152,9 @@ end
 function love.draw()
 	-- Draw background
 	love.graphics.setBackgroundColor(0.05, 0, 0.2) -- Dark blue background
+	local font = love.graphics.newFont(24)
+
+
 	if not gameStarted then
 		love.graphics.setColor(1, 1, 1) -- White color for text
 
@@ -159,7 +165,6 @@ function love.draw()
 
 		-- Draw "Press Enter to start" text in the middle
 		local text = "Press Enter to start"
-		local font = love.graphics.newFont(24)
 		love.graphics.setFont(font)
 		local textWidth = font:getWidth(text)
 		local textHeight = font:getHeight()
@@ -168,20 +173,18 @@ function love.draw()
 		-- Calculate the offset for the camera effect
 		local camera_offset_x = WindowWidth / 2 - bead.x
 		local camera_offset_y = WindowHeight / 2 - bead.y
-		-- Check if the bead has reached the ground
-		-- if reacedGround then
-		-- 	print("Reached ground")
-		-- 	-- Stop the camera movement when the bead is close to the ground
-		-- 	if bead.y >= WindowHeight / 2 then
-		-- 		print("Close to ground")
-		-- 		camera_offset_y = 0
-		-- 		camera_offset_x = 0
-		-- 	end
-		-- end
-		--
 
 		-- Translate the coordinate system to give the camera effect
 		love.graphics.translate(camera_offset_x, camera_offset_y)
+
+		-- Draw diamonds
+		love.graphics.setColor(1, 1, 0, 0.5) -- Yellow
+		for _, diamond in ipairs(diamonds) do
+			local size = diamond.size
+			love.graphics.polygon("fill", diamond.x, diamond.y - size, diamond.x - size, diamond.y, diamond
+				.x,
+				diamond.y + size, diamond.x + size, diamond.y)
+		end
 
 		-- Draw the bead image with rotation and scaling
 		love.graphics.setColor(1, 1, 1, 1)
@@ -208,24 +211,22 @@ function love.draw()
 			love.graphics.setColor(0.2, 0.3, 0.2)
 			love.graphics.rectangle("fill", bin.x, bin.y, bin.width, 0.2 * bin.height)
 
-			-- Set color for the number
+			-- Set color for the number on the bin
 			love.graphics.setColor(0, 0, 0)
 			-- Set font for the number
-			love.graphics.setFont(love.graphics.newFont(36))
-			-- Draw the random number at the center of the pipe
-			love.graphics.printf(tostring(bin.num), bin.x, bin.y, bin.width, "center")
-		end
-
-		-- Draw diamonds
-		love.graphics.setColor(1, 1, 0, 0.5) -- Yellow
-		for _, diamond in ipairs(diamonds) do
-			local size = diamond.size
-			love.graphics.polygon("fill", diamond.x, diamond.y - size, diamond.x - size, diamond.y, diamond
-				.x,
-				diamond.y + size, diamond.x + size, diamond.y)
+			love.graphics.setFont(font)
+			local final_bin_num = (bin.num + init_levels) / 2 + 1
+			love.graphics.printf(tostring(final_bin_num), bin.x, bin.y, bin.width, "center")
 		end
 
 		-- Reset the translation
 		love.graphics.translate(-camera_offset_x, -camera_offset_y)
+
+		-- Draw the number of rounds so far
+		love.graphics.setColor(1, 1, 1)
+		local roundsText = "Levels left: " .. colisions
+		local roundsTextWidth = font:getWidth(roundsText)
+		local roundsTextWidth = font:getWidth(roundsText)
+		love.graphics.print(roundsText, WindowWidth - roundsTextWidth - 20, 20)
 	end
 end
