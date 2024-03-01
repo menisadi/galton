@@ -4,13 +4,13 @@ math = require("math")
 WindowWidth, WindowHeight = love.window.getMode()
 
 local moveDirection = 2 * math.random(2) - 3
-local levels = 2
+local levels = 1
 local reacedGround = false
 
 -- Create a little circle
 local bead = {
 	x = WindowWidth * 0.2,
-	y = 0,
+	y = 0, -- WindowHeight * 0.0,
 	speed = { x = 200, y = 200 },
 	radius = 30,
 	angle = 0,
@@ -24,6 +24,14 @@ local peg = {
 	radius = 30,
 }
 
+local bin = {
+	height = WindowHeight * 0.5,
+	width = WindowWidth * 0.2,
+	x = (WindowWidth - WindowWidth * 0.2) / 2,
+	y = WindowWidth / 2,
+	num = 0
+}
+
 -- Add a variable to keep track of the arc angle offset
 local arcOffset = math.pi * 1.75
 
@@ -32,13 +40,6 @@ local gravity = 150
 -- Diamonds parameters
 local diamonds = {}
 local maxDiamonds = 5
-
-local ground = {
-	x = WindowWidth / 2,
-	y = WindowHeight * 0.95,
-	widtch = WindowWidth * 0.80,
-	height = 20
-}
 
 function love.load()
 	bead.image = love.graphics.newImage("bead.png")
@@ -70,7 +71,7 @@ function love.update(dt)
 	end
 
 	if reacedGround then
-		if bead.y + bead.radius >= ground.y - ground.height / 2 then
+		if bead.y - bead.radius >= bin.y then
 			gravity = 0
 			bead.speed.x = 0
 			bead.speed.y = 0
@@ -100,6 +101,7 @@ function love.update(dt)
 			bead.speed.x = bead.speed.y * 0.4 * side
 			bead.speed.y = -bead.speed.y * 0.4
 			bead.angleSign = side
+			bin.num = bin.num + 1 * side
 		end
 	end
 	-- if bead.y + bead.radius >= peg.y - peg.radius then
@@ -139,10 +141,17 @@ function love.draw()
 	-- Calculate the offset for the camera effect
 	local camera_offset_x = WindowWidth / 2 - bead.x
 	local camera_offset_y = WindowHeight / 2 - bead.y
-	if reacedGround and bead.y >= WindowHeight / 2 then
-		camera_offset_x = 0
-		camera_offset_y = 0
-	end
+	-- Check if the bead has reached the ground
+	-- if reacedGround then
+	-- 	print("Reached ground")
+	-- 	-- Stop the camera movement when the bead is close to the ground
+	-- 	if bead.y >= WindowHeight / 2 then
+	-- 		print("Close to ground")
+	-- 		camera_offset_y = 0
+	-- 		camera_offset_x = 0
+	-- 	end
+	-- end
+	--
 
 	-- Translate the coordinate system to give the camera effect
 	love.graphics.translate(camera_offset_x, camera_offset_y)
@@ -167,8 +176,17 @@ function love.draw()
 		local arcEnd = arcStart + math.pi / 2
 		love.graphics.arc("line", "open", peg.x, peg.y, arcRadius, arcStart, arcEnd)
 	else
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.rectangle("fill", WindowWidth * 0.1, WindowHeight * 0.95, ground.widtch, ground.height)
+		love.graphics.setColor(0.1, 0.4, 0.1)
+		love.graphics.rectangle("fill", bin.x, bin.y, bin.width, bin.height)
+		love.graphics.setColor(0.2, 0.3, 0.2)
+		love.graphics.rectangle("fill", bin.x, bin.y, bin.width, 0.2 * bin.height)
+
+		-- Set color for the number
+		love.graphics.setColor(0, 0, 0)
+		-- Set font for the number
+		love.graphics.setFont(love.graphics.newFont(36))
+		-- Draw the random number at the center of the pipe
+		love.graphics.printf(tostring(bin.num), bin.x, bin.y, bin.width, "center")
 	end
 
 	-- Draw diamonds
