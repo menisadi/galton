@@ -9,11 +9,13 @@ local pause = false
 -- Window specs
 WindowWidth, WindowHeight = love.window.getMode()
 
+local waitingTime = 2
 local moveDirection = 0
-local init_levels = 2
-local levels = init_levels
-local colisions = init_levels
+local initLevels = 1
+local levels = initLevels
+local colisions = initLevels
 local reacedGround = false
+local beads_num = 5
 
 -- Create a little circle
 local bead = {
@@ -93,6 +95,22 @@ function love.update(dt)
 				gravity = 0
 				bead.speed.x = 0
 				bead.speed.y = 0
+				if waitingTime > 0 then
+					waitingTime = waitingTime - dt
+				else
+					-- TODO: move all those to a reset function (and call on the start also)
+					bead.x = WindowWidth * 0.5
+					bead.y = 0
+					bead.speed = { x = 0, y = 200 }
+					bin.num = 0
+					levels = initLevels
+					waitingTime = 10
+					moveDirection = 0
+					levels = initLevels
+					colisions = initLevels
+					reacedGround = false
+					gravity = 150
+				end
 			end
 		end
 
@@ -230,7 +248,7 @@ function love.draw()
 			love.graphics.setColor(0, 0, 0)
 			-- Set font for the number
 			love.graphics.setFont(font)
-			local final_bin_num = (bin.num + init_levels) / 2 + 1
+			local final_bin_num = (bin.num + initLevels) / 2 + 1
 			love.graphics.printf(tostring(final_bin_num), bin.x, bin.y, bin.width, "center")
 		end
 
