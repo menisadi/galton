@@ -9,8 +9,8 @@ local pause = false
 -- Window specs
 WindowWidth, WindowHeight = love.window.getMode()
 
-local moveDirection = 2 * math.random(2) - 3
-local init_levels = 1
+local moveDirection = 0
+local init_levels = 2
 local levels = init_levels
 local colisions = init_levels
 local reacedGround = false
@@ -108,6 +108,13 @@ function love.update(dt)
 		elseif love.keyboard.isDown("left") then
 			arcOffset = math.max(math.pi * 1.5, (arcOffset - 0.2))
 			moveDirection = -1
+		elseif love.keyboard.isDown("up") then
+			moveDirection = 0
+			if arcOffset <= math.pi * 1.75 then
+				arcOffset = math.max(math.pi * 1.75, (arcOffset - 0.2))
+			else
+				arcOffset = math.min(math.pi * 1.75, (arcOffset + 0.2))
+			end
 		end
 
 		-- colision -> bounce
@@ -117,10 +124,15 @@ function love.update(dt)
 				bead.y = peg.y - peg.radius - bead.radius
 				-- local side = 2 * math.random(2) - 3
 				local side = moveDirection
-				bead.speed.x = bead.speed.y * 0.4 * side
-				bead.speed.y = -bead.speed.y * 0.4
-				bead.angleSign = side
-				bin.num = bin.num + 1 * side
+				if side == 0 then
+					bead.speed.x = 0
+					bead.speed.y = -bead.speed.y
+				else
+					bead.speed.x = bead.speed.y * 0.4 * side
+					bead.speed.y = -bead.speed.y * 0.4
+					bead.angleSign = side
+					bin.num = bin.num + 1 * side
+				end
 			end
 		end
 		-- if bead.y + bead.radius >= peg.y - peg.radius then
