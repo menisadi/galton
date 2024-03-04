@@ -51,6 +51,22 @@ local gravity = 150
 local diamonds = {}
 local maxDiamonds = 5
 
+local function resetVariables()
+	-- TODO: Use this function
+	bead.x = WindowWidth * 0.5
+	bead.y = 0
+	bead.speed = { x = 0, y = 200 }
+
+	bin.num = 0
+
+	waitingTime = 10
+	moveDirection = 0
+	levels = initLevels
+	colisions = initLevels
+	reacedGround = false
+	gravity = 150
+end
+
 function love.load()
 	bead.image = love.graphics.newImage("bead.png")
 end
