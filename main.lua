@@ -81,12 +81,13 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+	local animationSpeed = 1
 	if gameStarted and not pause then
 		bead.speed.y = bead.speed.y + gravity * dt
 		-- bead.speed.x = bead.speed.x + bead.acceleration.x
 
-		bead.y = bead.y + bead.speed.y * dt
-		bead.x = bead.x + bead.speed.x * dt
+		bead.y = bead.y + bead.speed.y * dt * animationSpeed
+		bead.x = bead.x + bead.speed.x * dt * animationSpeed
 
 		-- bead got to the bottom of the screen -> appear at the top
 		if bead.y > WindowHeight then
@@ -117,6 +118,8 @@ function love.update(dt)
 					-- TODO: move all those to a reset function (and call on the start also)
 					bead.x = WindowWidth * 0.5
 					bead.y = 0
+					bead.angle = 0
+					arcOffset = math.pi * 1.75
 					bead.speed = { x = 0, y = 200 }
 					bin.num = 0
 					levels = initLevels
@@ -154,14 +157,15 @@ function love.update(dt)
 		-- colision -> bounce
 		if dist(bead, peg) <= bead.radius + peg.radius then
 			if not reacedGround then
-				colisions = colisions - 1
 				bead.y = peg.y - peg.radius - bead.radius
 				-- local side = 2 * math.random(2) - 3
 				local side = moveDirection
 				if side == 0 then
+					local upSlowDown = 1
 					bead.speed.x = 0
-					bead.speed.y = -bead.speed.y
+					bead.speed.y = -bead.speed.y * upSlowDown
 				else
+					colisions = colisions - 1
 					bead.speed.x = bead.speed.y * 0.4 * side
 					bead.speed.y = -bead.speed.y * 0.4
 					bead.angleSign = side
